@@ -10,7 +10,12 @@ export default function Home() {
     async function fetchMessage() {
       try {
         // This will eventually change to be wherever our backend is.
-        let response = await fetch("http://localhost:8000/hello");
+        let response = await fetch("http://localhost:8000/events/", {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("jwtAccess")}`
+          }
+        });
         let result = await response.json();
         setData(result);
         console.log(result["message"]);
