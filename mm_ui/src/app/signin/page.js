@@ -1,12 +1,20 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth'
 
 function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const {isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push("/");
+    }
+  }, [loading, isAuthenticated, router]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -37,16 +45,20 @@ function SignIn() {
 
     } catch (err) {
       setError('Invalid email or password');
-      console.error(err);
+      console.error("Error encountered during handleSignin:", err);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
       <h2>Sign In</h2>
       <form onSubmit={handleSignIn}>
         <input
-          type="username"
+          type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
