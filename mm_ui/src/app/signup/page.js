@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth'
 
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 function SignUp() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -26,7 +28,7 @@ function SignUp() {
     }
     else {
       try {
-        const response = await fetch('http://localhost:8001/register/', {
+        const response = await fetch(`${AUTH_SERVICE_URL}/register/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password, email}),
