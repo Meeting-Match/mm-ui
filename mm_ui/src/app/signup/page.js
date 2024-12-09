@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth'
 
 function SignUp() {
   const [username, setUsername] = useState('');
@@ -9,6 +10,13 @@ function SignUp() {
   const [confirmPass, setConfirmPass] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const {isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push("/");
+    }
+  }, [loading, isAuthenticated, router]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -40,6 +48,10 @@ function SignUp() {
       }
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
@@ -81,4 +93,3 @@ function SignUp() {
 }
 
 export default SignUp;
-
