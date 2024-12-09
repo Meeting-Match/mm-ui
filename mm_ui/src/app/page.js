@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import SignOutButton from './components/SignOutButton';
 import PostEvent from './components/PostEvent';
 
+const SCHEDULING_SERVICE_URL = process.env.NEXT_PUBLIC_SCHEDULING_SERVICE_URL;
+
 export default function Home() {
   const [data, setData] = useState(null);
   const { isAuthenticated, loading } = useAuth();
@@ -27,7 +29,7 @@ export default function Home() {
       try {
         // This will eventually change to be wherever our backend is.
         const access = localStorage.getItem('jwtAccess');
-        let response = await fetch("http://localhost:8000/events/", {
+        let response = await fetch(`${SCHEDULING_SERVICE_URL}/events/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${access}`

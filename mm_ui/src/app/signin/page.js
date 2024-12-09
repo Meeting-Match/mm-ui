@@ -5,6 +5,8 @@ import { useAuth } from '../../hooks/useAuth'
 
 import styles from './SignIn.module.css';
 
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +25,7 @@ function SignIn() {
     setError(''); // Reset error message
 
     try {
-      const response = await fetch('http://localhost:8001/token/', {
+      const response = await fetch(`${AUTH_SERVICE_URL}/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

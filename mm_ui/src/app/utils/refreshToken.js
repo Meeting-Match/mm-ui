@@ -1,3 +1,5 @@
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 export async function refreshToken() {
   const refreshToken = localStorage.getItem('jwtRefresh');
   if (!refreshToken) {
@@ -5,7 +7,7 @@ export async function refreshToken() {
   }
 
   try {
-    const response = await fetch('http://localhost:8001/token/refresh/', {
+    const response = await fetch(`${AUTH_SERVICE_URL}/token/refresh/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

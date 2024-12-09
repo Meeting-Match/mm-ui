@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -9,7 +11,7 @@ export const useAuth = () => {
     try {
       const jwtRefresh = localStorage.getItem("jwtRefresh");
       if (!jwtRefresh) return false;
-      let response = await fetch("http://localhost:8001/token/refresh/",  {
+      let response = await fetch(`${AUTH_SERVICE_URL}/token/refresh/`,  {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh: jwtRefresh }),
