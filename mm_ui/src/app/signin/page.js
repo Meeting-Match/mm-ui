@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth'
 
+import styles from './SignIn.module.css';
+
 function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -54,10 +56,11 @@ function SignIn() {
   }
 
   return (
-    <div>
-      <h2>Sign In</h2>
+    <div className={styles.container}>
+      <h2 className={styles.title}>Sign In</h2>
       <form onSubmit={handleSignIn}>
         <input
+          className={styles.input}
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -65,18 +68,18 @@ function SignIn() {
           required
         />
         <input
+          className={styles.input}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
         />
-        <button type="submit">Sign In</button>
+        <button className={styles.button} type="submit">Sign In</button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className={styles.errorMessage}>{error}</p>}
     </div>
   );
 }
 
 export default SignIn;
-

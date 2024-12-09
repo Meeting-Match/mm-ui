@@ -5,6 +5,9 @@ import { useAuth } from '../hooks/useAuth'
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import SignOutButton from './components/SignOutButton';
+import PostEvent from './components/PostEvent';
+
 export default function Home() {
   const [data, setData] = useState(null);
   const { isAuthenticated, loading } = useAuth();
@@ -55,6 +58,9 @@ export default function Home() {
 
       <h1>The backend returned:</h1>
       <pre>{JSON.stringify(data, null, 2)}</pre>
+
+      <PostEvent />
+      <SignOutButton />
 
     </>
   );
