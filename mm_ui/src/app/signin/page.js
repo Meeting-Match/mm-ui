@@ -82,17 +82,6 @@ function SignIn() {
 
           {error && <p className="text-red-600">{error}</p>}
 
-          <div className="flex items-center justify-between text-sm">
-            <div>
-              <input type="checkbox" id="rememberMe" className="mr-2" />
-              <label htmlFor="rememberMe" className="text-gray-600">
-                Remember Me
-              </label>
-            </div>
-            <a href="#" className="text-indigo-600 hover:underline">
-              Forgot Password?
-            </a>
-          </div>
 
           <button
             type="submit"
@@ -102,21 +91,6 @@ function SignIn() {
           </button>
         </form>
 
-        <div className="mt-6 flex items-center justify-center">
-          <span className="text-gray-500 text-sm">Or sign in with</span>
-        </div>
-
-        <div className="mt-3 flex space-x-4 justify-center">
-          <button className="p-2 rounded-full border hover:bg-gray-100 transition">
-            {/* Placeholder icon, replace with FontAwesome or an SVG */}
-            <span className="sr-only">Sign in with Facebook</span>
-            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="..."/></svg>
-          </button>
-          <button className="p-2 rounded-full border hover:bg-gray-100 transition">
-            <span className="sr-only">Sign in with Twitter</span>
-            <svg className="w-5 h-5 text-sky-500" fill="currentColor" viewBox="0 0 24 24"><path d="..."/></svg>
-          </button>
-        </div>
       </div>
 
       {/* Right column: gradient background with prompt to sign up */}
