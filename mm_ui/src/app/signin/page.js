@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth'
 
-import styles from './SignIn.module.css';
+//import styles from './SignIn.module.css';
 
 const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
@@ -107,3 +107,4 @@ function SignIn() {
     </div>
   );
 }
+export default SignIn;

@@ -5484,6 +5484,10 @@ next-env.d.ts
 }
 
 
+===== .env =====
+
+NEXT_PUBLIC_AUTH_SERVICE_URL="https://localhost:3000"
+
 ===== .eslintrc.json =====
 
 {
@@ -5737,7 +5741,6 @@ export default SignUp;
 
 ===== src/app/utils/refreshToken.js =====
 
-"use client";
 const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
 export async function refreshToken() {
@@ -6099,7 +6102,6 @@ function SignIn() {
   );
 }
 
-
 ===== src/app/signin/SignIn.module.css =====
 
 .container {
@@ -6159,7 +6161,7 @@ function SignIn() {
 
 ===== src/hooks/useAuth.js =====
 
-"use client";
+//"use client";
 import { useState, useEffect } from "react";
 import  jwtDecode  from "jwt-decode";
 
