@@ -205,7 +205,7 @@ next-env.d.ts
       "name": "mm_ui",
       "version": "0.1.0",
       "dependencies": {
-        "jwt-decode": "^4.0.0",
+        "jwt-decode": "^3.1.2",
         "next": "14.2.14",
         "react": "^18",
         "react-dom": "^18"
@@ -3415,13 +3415,10 @@ next-env.d.ts
       }
     },
     "node_modules/jwt-decode": {
-      "version": "4.0.0",
-      "resolved": "https://registry.npmjs.org/jwt-decode/-/jwt-decode-4.0.0.tgz",
-      "integrity": "sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=18"
-      }
+      "version": "3.1.2",
+      "resolved": "https://registry.npmjs.org/jwt-decode/-/jwt-decode-3.1.2.tgz",
+      "integrity": "sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==",
+      "license": "MIT"
     },
     "node_modules/keyv": {
       "version": "4.5.4",
@@ -5473,7 +5470,7 @@ next-env.d.ts
     "lint": "next lint"
   },
   "dependencies": {
-    "jwt-decode": "^4.0.0",
+    "jwt-decode": "^3.1.2",
     "next": "14.2.14",
     "react": "^18",
     "react-dom": "^18"
@@ -5545,6 +5542,8 @@ import { useEffect, useState } from 'react';
 import SignOutButton from './components/SignOutButton';
 import PostEvent from './components/PostEvent';
 
+const SCHEDULING_SERVICE_URL = process.env.NEXT_PUBLIC_SCHEDULING_SERVICE_URL;
+
 export default function Home() {
   const [data, setData] = useState(null);
   const { isAuthenticated, loading } = useAuth();
@@ -5564,7 +5563,7 @@ export default function Home() {
       try {
         // This will eventually change to be wherever our backend is.
         const access = localStorage.getItem('jwtAccess');
-        let response = await fetch("http://localhost:8000/events/", {
+        let response = await fetch(`${SCHEDULING_SERVICE_URL}/events/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${access}`
@@ -5642,6 +5641,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth'
 
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 function SignUp() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -5665,7 +5666,7 @@ function SignUp() {
     }
     else {
       try {
-        const response = await fetch('http://localhost:8001/register/', {
+        const response = await fetch(`${AUTH_SERVICE_URL}/register/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password, email}),
@@ -5736,6 +5737,9 @@ export default SignUp;
 
 ===== src/app/utils/refreshToken.js =====
 
+"use client";
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 export async function refreshToken() {
   const refreshToken = localStorage.getItem('jwtRefresh');
   if (!refreshToken) {
@@ -5743,7 +5747,7 @@ export async function refreshToken() {
   }
 
   try {
-    const response = await fetch('http://localhost:8001/token/refresh/', {
+    const response = await fetch(`${AUTH_SERVICE_URL}/token/refresh/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -5778,6 +5782,8 @@ import { useRouter } from 'next/navigation';
 
 import { refreshToken } from '../utils/refreshToken.js';
 
+const SCHEDULING_SERVICE_URL = process.env.NEXT_PUBLIC_SCHEDULING_SERVICE_URL;
+
 export default function PostEvent() {
   const [formData, setFormData] = useState({
     title: '',
@@ -5801,7 +5807,7 @@ export default function PostEvent() {
     setSuccess(false);
 
     try {
-      let response = await fetch('http://localhost:8000/events/', {
+      let response = await fetch(`${SCHEDULING_SERVICE_URL}/events/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -5820,7 +5826,7 @@ export default function PostEvent() {
         let newAccess = await refreshToken();
         localStorage.setItem('jwtAccess', newAccess);
 
-        let response = await fetch('http://localhost:8000/events/', {
+        let response = await fetch(`${SCHEDULING_SERVICE_URL}/events/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -5990,12 +5996,14 @@ import { useAuth } from '../../hooks/useAuth'
 
 import styles from './SignIn.module.css';
 
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+
 function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const {isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -6005,69 +6013,91 @@ function SignIn() {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setError(''); // Reset error message
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:8001/token/', {
+      const response = await fetch(`${AUTH_SERVICE_URL}/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
-        throw new Error('Authentication failed');
+        throw new Error("Authentication failed");
       }
 
-      // console.log(response)
       const data = await response.json();
-      console.log(data)
-      const access = data.access;
-      const refresh = data.refresh;
-
-      localStorage.setItem('jwtAccess', access);
-      localStorage.setItem('jwtRefresh', refresh);
-      console.log('Logged in successfully!');
-      console.log(`Access token: ${access}`)
-      router.push('/');
-
+      localStorage.setItem("jwtAccess", data.access);
+      localStorage.setItem("jwtRefresh", data.refresh);
+      router.push("/");
     } catch (err) {
-      setError('Invalid email or password');
+      setError("Invalid email or password");
       console.error("Error encountered during handleSignin:", err);
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Sign In</h2>
-      <form onSubmit={handleSignIn}>
-        <input
-          className={styles.input}
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        <input
-          className={styles.input}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button className={styles.button} type="submit">Sign In</button>
-      </form>
-      {error && <p className={styles.errorMessage}>{error}</p>}
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Left column: Sign In form */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16 bg-white">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Sign In</h2>
+        
+        <form onSubmit={handleSignIn} className="space-y-5">
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">Username</label>
+            <input
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">Password</label>
+            <input
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
+          </div>
+
+          {error && <p className="text-red-600">{error}</p>}
+
+
+          <button
+            type="submit"
+            className="w-full py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded hover:from-pink-600 hover:to-red-600 transition-colors"
+          >
+            Sign In
+          </button>
+        </form>
+
+      </div>
+
+      {/* Right column: gradient background with prompt to sign up */}
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gradient-to-r from-pink-500 to-red-500 text-white p-8 md:p-16">
+        <h2 className="text-3xl font-bold mb-2">Welcome to login</h2>
+        <p className="text-lg mb-8">Don't have an account?</p>
+        <a
+          href="/signup"
+          className="inline-block px-6 py-2 border border-white rounded text-white hover:bg-white hover:text-pink-500 transition"
+        >
+          Sign Up
+        </a>
+      </div>
     </div>
   );
 }
-
-export default SignIn;
 
 
 ===== src/app/signin/SignIn.module.css =====
@@ -6129,8 +6159,11 @@ export default SignIn;
 
 ===== src/hooks/useAuth.js =====
 
+"use client";
 import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import  jwtDecode  from "jwt-decode";
+
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -6140,7 +6173,7 @@ export const useAuth = () => {
     try {
       const jwtRefresh = localStorage.getItem("jwtRefresh");
       if (!jwtRefresh) return false;
-      let response = await fetch("http://localhost:8001/token/refresh/",  {
+      let response = await fetch(`${AUTH_SERVICE_URL}/token/refresh/`,  {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh: jwtRefresh }),

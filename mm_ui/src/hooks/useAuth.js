@@ -1,5 +1,6 @@
+"use client";
 import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import  jwtDecode  from "jwt-decode";
 
 const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
