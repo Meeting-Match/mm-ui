@@ -12,29 +12,94 @@ export default function ParticipatingEvents() {
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return;
+    // Debugging: Log authentication status and user information
+    console.log("Authentication Status:", isAuthenticated);
+    console.log("Loading:", loading);
+    console.log("User Object:", user);
+
+    if (loading) return; // Still loading, do nothing
     if (!isAuthenticated) {
       router.push("/signin");
       return;
     }
 
+    if (!user || !user.username) {
+      setError("User information is missing.");
+      console.error("User or user.username is undefined:", user);
+      return;
+    } else {
+      // Clear any existing errors when user data is available
+      if (error) {
+        setError("");
+      }
+    }
+
     const fetchParticipatingEvents = async () => {
       try {
-        const allEvents = await api(`/events/`);
-        const participating = allEvents.filter(event => event.participant_ids.includes(user.id));
+        const response = await api(`/events/`);
+        console.log("API Response:", response);
+
+        // Validate response structure
+        if (!response || !response.results) {
+          throw new Error("Invalid response structure");
+        }
+
+        // Log each event's participant_ids
+        response.results.forEach(event => {
+          console.log(`Event ID: ${event.id}, Participant IDs:`, event.participant_ids);
+        });
+
+        // Use user.username for filtering
+        const userUsername = String(user.username);
+        console.log("User Username (string):", userUsername);
+
+        // Filter events where participant_ids include the user's username
+        const participating = response.results.filter(event => 
+          event.participant_ids.includes(userUsername)
+        );
+        console.log("Participating Events:", participating);
+
         setEvents(participating);
       } catch (err) {
+        console.error("Error fetching participating events:", err);
         setError("Error fetching participating events");
       }
     };
 
     fetchParticipatingEvents();
-  }, [isAuthenticated, loading, router, user]);
+  }, [isAuthenticated, loading, router, user, error]); // Added 'error' to dependencies
 
-  if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  if (!isAuthenticated) return null;
-  if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
-  if (events.length === 0) return <div className="text-center mt-10">You are not participating in any events.</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Optionally, you can show a message or a redirect
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center mt-10 text-red-600">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center mt-10">
+          You are not participating in any events.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -47,6 +112,8 @@ export default function ParticipatingEvents() {
                 {event.title}
               </Link>
               <p className="text-sm text-gray-600">{new Date(event.datetime).toLocaleString()}</p>
+              <p className="text-sm text-gray-600"><strong>Location:</strong> {event.location}</p>
+              <p className="text-sm text-gray-600"><strong>Description:</strong> {event.description}</p>
             </li>
           ))}
         </ul>

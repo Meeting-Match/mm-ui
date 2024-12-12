@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
-import { api } from '../../utils/api';
 import AddAvailability from "../../components/AddAvailability";
+import { api } from '../../utils/api';
 
 import Link from "next/link";
 
