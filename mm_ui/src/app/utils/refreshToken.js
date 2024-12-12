@@ -1,3 +1,4 @@
+"use client";
 const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
 export async function refreshToken() {
