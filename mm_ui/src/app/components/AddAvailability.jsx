@@ -11,19 +11,19 @@ export default function AddAvailability({ eventId }) {
     e.preventDefault();
     setStatus('');
     try {
-      await api('/availability/', {
+      await api('/availabilities/', {
         method: 'POST',
         body: {
           start,
           end,
-          event: `${process.env.NEXT_PUBLIC_SCHEDULING_SERVICE_URL}/events/${eventId}/` // HyperlinkedRelatedField (if needed)
+          event: eventId, // Pass eventId as a plain ID
         },
       });
       setStatus('Availability added successfully!');
       setStart('');
       setEnd('');
     } catch (error) {
-      setStatus('Failed to add availability.');
+      setStatus(error.message || 'Failed to add availability.');
     }
   };
 

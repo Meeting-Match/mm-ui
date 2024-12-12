@@ -20,6 +20,7 @@ export const api = async (endpoint, { method = 'GET', body = null, ...customConf
   };
 
   if (body) {
+    console.log('Request Body:', JSON.stringify(body));
     config.body = JSON.stringify(body);
   }
 

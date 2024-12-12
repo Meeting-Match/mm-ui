@@ -30,7 +30,7 @@ export default function PostEvent() {
     setSuccess(false);
 
     try {
-      let response = await fetch(`${SCHEDULING_SERVICE_URL}/events/`, {
+      let response = await fetch(`http://localhost:8002/postevent/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

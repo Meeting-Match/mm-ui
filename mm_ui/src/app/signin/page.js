@@ -25,7 +25,7 @@ function SignIn() {
     setError("");
 
     try {
-      const response = await fetch(`${AUTH_SERVICE_URL}/token/`, {
+      const response = await fetch(`http://localhost:8001/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -96,7 +96,7 @@ function SignIn() {
       {/* Right column: gradient background with prompt to sign up */}
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gradient-to-r from-pink-500 to-red-500 text-white p-8 md:p-16">
         <h2 className="text-3xl font-bold mb-2">Welcome to login</h2>
-        <p className="text-lg mb-8">Don't have an account?</p>
+        <p className="text-lg mb-8">Don&apos;t have an account?</p>
         <a
           href="/signup"
           className="inline-block px-6 py-2 border border-white rounded text-white hover:bg-white hover:text-pink-500 transition"
