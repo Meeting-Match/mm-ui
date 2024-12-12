@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/useAuth";
 import Link from "next/link";
-import { api } from "../../../../utils/api";
+import { api } from '../../utils/api';
 
 export default function ParticipatingEvents() {
   const { isAuthenticated, loading, user } = useAuth();

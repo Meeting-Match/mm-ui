@@ -6437,7 +6437,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../hooks/useAuth";
 import Link from "next/link";
-import { api } from "../../../../utils/api";
+import { api } from '../../utils/api';
 
 export default function ParticipatingEvents() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -6497,9 +6497,9 @@ export default function ParticipatingEvents() {
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/useAuth";
 import Link from "next/link";
-import { api } from "../../../../utils/api";
+import { api } from '../../utils/api';
 
 export default function CreatedEvents() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -6559,8 +6559,8 @@ export default function CreatedEvents() {
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAuth } from "../../../../hooks/useAuth";
-import { api } from "../../../../utils/api";
+import { useAuth } from "../../../hooks/useAuth";
+import { api } from '../../utils/api';
 import AddAvailability from "../../../components/AddAvailability";
 import Link from "next/link";
 
@@ -6627,7 +6627,6 @@ export default function EventDetails() {
 
 ===== src/hooks/useAuth.js =====
 
-"use client";
 import { useState, useEffect } from "react";
 import  jwtDecode  from "jwt-decode";
 
