@@ -4,12 +4,12 @@ import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 import AddAvailability from "../../components/AddAvailability";
 import { api } from '../../utils/api';
-
 import Link from "next/link";
+import DeleteEventButton from "../../components/DeleteEventButton"; // Import here
 
 export default function EventDetails() {
   const { eventId } = useParams();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth(); // If you have user info, you can also check if the user is allowed to delete.
   const [event, setEvent] = useState(null);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -47,6 +47,9 @@ export default function EventDetails() {
         <p className="mb-2"><strong>Location:</strong> {event.location}</p>
         <p className="mb-2"><strong>Organizer ID:</strong> {event.organizer_id}</p>
         <p className="mb-4"><strong>Participants:</strong> {event.participant_ids.join(', ')}</p>
+
+        {/* Add the DeleteEventButton below */}
+        <DeleteEventButton eventId={eventId} />
 
         <AddAvailability eventId={eventId} />
 
