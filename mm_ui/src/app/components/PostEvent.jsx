@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { refreshToken } from '../utils/refreshToken.js';
 
 const SCHEDULING_SERVICE_URL = process.env.NEXT_PUBLIC_SCHEDULING_SERVICE_URL;
+const COMPOSITE_SERVICE_URL = process.env.NEXT_PUBLIC_COMPOSITE_SERVICE_URL;
 
 export default function PostEvent() {
   const [formData, setFormData] = useState({
@@ -30,7 +31,7 @@ export default function PostEvent() {
     setSuccess(false);
 
     try {
-      let response = await fetch(`http://localhost:8002/postevent/`, {
+      let response = await fetch(`${COMPOSITE_SERVICE_URL}/postevent/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
