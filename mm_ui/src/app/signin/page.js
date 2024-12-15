@@ -38,7 +38,7 @@ function SignIn() {
       const data = await response.json();
       localStorage.setItem("jwtAccess", data.access);
       localStorage.setItem("jwtRefresh", data.refresh);
-      router.push("/");
+      router.push("dashboard");
     } catch (err) {
       setError("Invalid email or password");
       console.error("Error encountered during handleSignin:", err);
