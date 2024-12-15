@@ -3,16 +3,18 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 import AddAvailability from "../../components/AddAvailability";
-import { api } from '../../utils/api';
+import { api } from "../../utils/api";
 import Link from "next/link";
 import DeleteEventButton from "../../components/DeleteEventButton"; // Import here
+import EditEventForm from "../../components/EditEventForm"; // Import the EditEventForm component
 
 export default function EventDetails() {
   const { eventId } = useParams();
-  const { isAuthenticated, loading, user } = useAuth(); // If you have user info, you can also check if the user is allowed to delete.
+  const { isAuthenticated, loading, user } = useAuth();
   const [event, setEvent] = useState(null);
-  const [availabilities, setAvailabilities] = useState([]); // State to hold availability data
+  const [availabilities, setAvailabilities] = useState([]);
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false); // Add editing state
   const router = useRouter();
 
   useEffect(() => {
@@ -24,14 +26,12 @@ export default function EventDetails() {
 
     const fetchEvent = async () => {
       try {
-        // Fetch event details from composite service
         const data = await api(`/getevent/${eventId}/`, { useCompositeService: true });
-        console.log(`Retrieved enriched event data: ${data}`);
+        console.log(`Retrieved enriched event data:`, data);
         setEvent(data);
 
-        // Fetch associated availability details from scheduling service
         const availabilityData = await api(`/events/${eventId}/availability`);
-        console.log(`Retrieved availability data: ${availabilityData}`);
+        console.log(`Retrieved availability data:`, availabilityData);
         setAvailabilities(availabilityData.results);
       } catch (err) {
         setError("Error fetching event details or availability data");
@@ -41,10 +41,32 @@ export default function EventDetails() {
     fetchEvent();
   }, [isAuthenticated, loading, eventId, router]);
 
+  const getOrganizerId = () => {
+    if (!event?.organizer_profile) return null;
+    const urlParts = event.organizer_profile.split("/");
+    return urlParts[urlParts.length - 2];
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing); // Toggle the edit mode
+  };
+
+  const handleEditSuccess = (updatedEvent) => {
+    setEvent(updatedEvent); // Update event data after successful edit
+    setIsEditing(false); // Exit edit mode
+  };
+
+  const handleEditCancel = () => {
+    setIsEditing(false); // Exit edit mode
+  };
+
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
   if (!isAuthenticated) return null;
   if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
   if (!event) return <div className="text-center mt-10">Loading event...</div>;
+
+  const organizerId = Number(getOrganizerId());
+  const userId = Number(user?.id);
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -53,8 +75,8 @@ export default function EventDetails() {
         <p className="mb-2"><strong>Date and Time:</strong> {new Date(event.datetime).toLocaleString()}</p>
         <p className="mb-2"><strong>Description:</strong> {event.description}</p>
         <p className="mb-2"><strong>Location:</strong> {event.location}</p>
-        <p className="mb-2"><strong>Organizer:</strong> {event.organizer?.username} ({event.organizer?.email})</p>
-        <p className="mb-4"><strong>Participants:</strong> {event.participants?.map(p => `${p.username} (${p.email})`).join(', ')}</p>
+        <p className="mb-2"><strong>Organizer Profile:</strong> <a href={event.organizer_profile} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">{event.organizer_profile}</a></p>
+        <p className="mb-4"><strong>Participants:</strong> {event.participants?.map(p => `${p.username} (${p.email})`).join(", ")}</p>
 
         {/* Availability section */}
         <div className="mb-4">
@@ -62,7 +84,7 @@ export default function EventDetails() {
           {availabilities.length > 0 ? (
             availabilities.map((availability, index) => (
               <div key={index} className="mb-2">
-                <p><strong>Participant ID:</strong> {availability.participant.split('/').pop()}</p>
+                <p><strong>Participant ID:</strong> {availability.participant.split("/").pop()}</p>
                 <p><strong>Start:</strong> {new Date(availability.start).toLocaleString()}</p>
                 <p><strong>End:</strong> {new Date(availability.end).toLocaleString()}</p>
               </div>
@@ -72,8 +94,25 @@ export default function EventDetails() {
           )}
         </div>
 
-        {/* Add the DeleteEventButton below */}
-        <DeleteEventButton eventId={eventId} />
+        {/* Edit/Delete section, only for the organizer */}
+        {organizerId === userId && (
+          <div className="mb-4">
+            {!isEditing ? (
+              <>
+                <button onClick={handleEditToggle} className="text-blue-600 underline mr-4">
+                  Edit Event
+                </button>
+                <DeleteEventButton eventId={eventId} />
+              </>
+            ) : (
+              <EditEventForm
+                event={event}
+                onSuccess={handleEditSuccess}
+                onCancel={handleEditCancel}
+              />
+            )}
+          </div>
+        )}
 
         <AddAvailability eventId={eventId} />
 

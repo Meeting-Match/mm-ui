@@ -1,5 +1,3 @@
-// src/app/events/created/page.js
-
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,20 +20,17 @@ export default function CreatedEvents() {
 
     const fetchCreatedEvents = async () => {
       try {
-        const response = await api(`/events/`);
+        // Update the API endpoint to fetch events where the user is the organizer
+        const response = await api(`/events/organizer/`);
         
         // Verify response structure
         if (!response || !response.results) {
           throw new Error("Invalid response structure");
         }
 
-        console.log("Fetched events:", response.results);
-        const allEvents = response.results; // Access the 'results' array
+        console.log("Fetched created events:", response.results);
+        setEvents(response.results); // Set the fetched events
 
-        // Since 'organizer_id' does not exist, display all events or implement alternative logic
-        // For demonstration, let's display all events and highlight those where the user is a participant
-
-        setEvents(allEvents);
       } catch (err) {
         setError("Error fetching created events");
         console.error("Error details:", err);
