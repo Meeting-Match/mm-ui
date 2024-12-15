@@ -12,54 +12,32 @@ export default function ParticipatingEvents() {
   const router = useRouter();
 
   useEffect(() => {
-    // Debugging: Log authentication status and user information
-    console.log("Authentication Status:", isAuthenticated);
-    console.log("Loading:", loading);
-    console.log("User Object:", user);
-
-    if (loading) return; // Still loading, do nothing
-    if (!isAuthenticated) {
-      router.push("/signin");
-      return;
-    }
+    // Early return if loading or not authenticated
+    if (loading) return;
+    if (!isAuthenticated) return router.push("/signin");
 
     if (!user || !user.username) {
       setError("User information is missing.");
-      console.error("User or user.username is undefined:", user);
       return;
-    } else {
-      // Clear any existing errors when user data is available
-      if (error) {
-        setError("");
-      }
     }
 
+    // Clear any existing error when user info is available
+    if (error) setError("");
+
+    // Fetch events the user is participating in
     const fetchParticipatingEvents = async () => {
       try {
-        const response = await api(`/events/`);
-        console.log("API Response:", response);
-
-        // Validate response structure
-        if (!response || !response.results) {
+        const response = await api(`/events/participant/`);
+        if (!response?.results) {
           throw new Error("Invalid response structure");
         }
 
-        // Log each event's participant_ids
-        response.results.forEach(event => {
-          console.log(`Event ID: ${event.id}, Participant IDs:`, event.participant_ids);
-        });
-
-        // Use user.username for filtering
-        const userUsername = String(user.username);
-        console.log("User Username (string):", userUsername);
-
-        // Filter events where participant_ids include the user's username
-        const participating = response.results.filter(event => 
-          event.participant_ids.includes(userUsername)
+        const userId = String(user.id); // Assuming user.id is numeric or string type
+        const participatingEvents = response.results.filter((event) =>
+          event.participant_ids.includes(userId)
         );
-        console.log("Participating Events:", participating);
 
-        setEvents(participating);
+        setEvents(participatingEvents);
       } catch (err) {
         console.error("Error fetching participating events:", err);
         setError("Error fetching participating events");
@@ -67,9 +45,9 @@ export default function ParticipatingEvents() {
     };
 
     fetchParticipatingEvents();
-  }, [isAuthenticated, loading, router, user, error]); // Added 'error' to dependencies
+  }, [isAuthenticated, loading, user, error, router]);
 
-  if (loading) {
+  if (loading || !isAuthenticated) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Loading...</p>
@@ -77,16 +55,10 @@ export default function ParticipatingEvents() {
     );
   }
 
-  if (!isAuthenticated) {
-    return null; // Optionally, you can show a message or a redirect
-  }
-
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center mt-10 text-red-600">
-          {error}
-        </div>
+        <div className="text-center mt-10 text-red-600">{error}</div>
       </div>
     );
   }
@@ -94,9 +66,7 @@ export default function ParticipatingEvents() {
   if (events.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center mt-10">
-          You are not participating in any events.
-        </div>
+        <div className="text-center mt-10">You are not participating in any events.</div>
       </div>
     );
   }
@@ -104,7 +74,7 @@ export default function ParticipatingEvents() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-4">Events I'm Participating In</h1>
+        <h1 className="text-2xl font-bold mb-4">Events I&apos;m Participating In</h1>
         <ul className="space-y-2">
           {events.map((event) => (
             <li key={event.id} className="p-4 border rounded hover:bg-gray-50">

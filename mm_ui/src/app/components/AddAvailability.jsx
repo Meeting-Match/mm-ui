@@ -9,13 +9,21 @@ export default function AddAvailability({ eventId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    startDate.setHours(startDate.getHours() - 5);
+    endDate.setHours(endDate.getHours() - 5);
+
+    const adjustedStart = startDate.toISOString();
+    const adjustedEnd = endDate.toISOString();   
     setStatus('');
     try {
       await api('/availabilities/', {
         method: 'POST',
         body: {
-          start,
-          end,
+          start: adjustedStart,
+          end: adjustedEnd,
           event: eventId, // Pass eventId as a plain ID
         },
       });
