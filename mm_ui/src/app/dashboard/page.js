@@ -27,7 +27,7 @@ export default function Dashboard() {
             My Created Events
           </Link>
           <Link href="/events/participating" className="block bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition">
-            Events I'm Participating In
+            Events I am Participating In
           </Link>
         </div>
         <SignOutButton />
