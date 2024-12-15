@@ -11,6 +11,7 @@ export default function EventDetails() {
   const { eventId } = useParams();
   const { isAuthenticated, loading, user } = useAuth(); // If you have user info, you can also check if the user is allowed to delete.
   const [event, setEvent] = useState(null);
+  const [availabilities, setAvailabilities] = useState([]); // State to hold availability data
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -23,10 +24,17 @@ export default function EventDetails() {
 
     const fetchEvent = async () => {
       try {
-        const data = await api(`/events/${eventId}/`);
+        // Fetch event details from composite service
+        const data = await api(`/getevent/${eventId}/`, { useCompositeService: true });
+        console.log(`Retrieved enriched event data: ${data}`);
         setEvent(data);
+
+        // Fetch associated availability details from scheduling service
+        const availabilityData = await api(`/events/${eventId}/availability`);
+        console.log(`Retrieved availability data: ${availabilityData}`);
+        setAvailabilities(availabilityData.results);
       } catch (err) {
-        setError("Error fetching event details");
+        setError("Error fetching event details or availability data");
       }
     };
 
@@ -45,8 +53,24 @@ export default function EventDetails() {
         <p className="mb-2"><strong>Date and Time:</strong> {new Date(event.datetime).toLocaleString()}</p>
         <p className="mb-2"><strong>Description:</strong> {event.description}</p>
         <p className="mb-2"><strong>Location:</strong> {event.location}</p>
-        <p className="mb-2"><strong>Organizer ID:</strong> {event.organizer_id}</p>
-        <p className="mb-4"><strong>Participants:</strong> {event.participant_ids.join(', ')}</p>
+        <p className="mb-2"><strong>Organizer:</strong> {event.organizer?.username} ({event.organizer?.email})</p>
+        <p className="mb-4"><strong>Participants:</strong> {event.participants?.map(p => `${p.username} (${p.email})`).join(', ')}</p>
+
+        {/* Availability section */}
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold">Availability:</h2>
+          {availabilities.length > 0 ? (
+            availabilities.map((availability, index) => (
+              <div key={index} className="mb-2">
+                <p><strong>Participant ID:</strong> {availability.participant.split('/').pop()}</p>
+                <p><strong>Start:</strong> {new Date(availability.start).toLocaleString()}</p>
+                <p><strong>End:</strong> {new Date(availability.end).toLocaleString()}</p>
+              </div>
+            ))
+          ) : (
+            <p>No availability data available.</p>
+          )}
+        </div>
 
         {/* Add the DeleteEventButton below */}
         <DeleteEventButton eventId={eventId} />

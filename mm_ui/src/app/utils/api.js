@@ -1,7 +1,12 @@
 const SCHEDULING_SERVICE_URL = process.env.NEXT_PUBLIC_SCHEDULING_SERVICE_URL;
 const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+const COMPOSITE_SERVICE_URL = process.env.NEXT_PUBLIC_COMPOSITE_SERVICE_URL;
 
-export const api = async (endpoint, { method = 'GET', body = null, ...customConfig } = {}) => {
+export const api = async (
+  endpoint,
+  { method = 'GET', body = null, useCompositeService = false, ...customConfig } = {}
+) => {
+  const baseUrl = useCompositeService ? COMPOSITE_SERVICE_URL : SCHEDULING_SERVICE_URL;
   let accessToken = localStorage.getItem('jwtAccess');
 
   let headers = {
@@ -24,7 +29,7 @@ export const api = async (endpoint, { method = 'GET', body = null, ...customConf
     config.body = JSON.stringify(body);
   }
 
-  let response = await fetch(`${SCHEDULING_SERVICE_URL}${endpoint}`, config);
+  let response = await fetch(`${baseUrl}${endpoint}`, config);
 
   if (response.status === 401) {
     // Attempt to refresh token
@@ -33,7 +38,7 @@ export const api = async (endpoint, { method = 'GET', body = null, ...customConf
       accessToken = localStorage.getItem('jwtAccess');
       headers['Authorization'] = `Bearer ${accessToken}`;
       config.headers = headers;
-      response = await fetch(`${SCHEDULING_SERVICE_URL}${endpoint}`, config);
+      response = await fetch(`${baseUrl}${endpoint}`, config);
     } else {
       window.location.href = '/signin';
       return;
